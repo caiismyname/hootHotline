@@ -1,0 +1,31 @@
+{
+  "name": "hoothotline",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caiismyname/hootHotline.git"
+  },
+  "engines": {
+    "node": "8.11.1"
+  },
+  "author": "David Cai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/caiismyname/hootHotline/issues"
+  },
+  "homepage": "https://github.com/caiismyname/hootHotline#readme",
+  "dependencies": {
+    "body-parser": "1.18.2",
+    "dotenv": "5.0.1",
+    "ejs": "2.6.1",
+    "express": "4.16.3",
+    "firebase": "5.0.1",
+    "firebase-admin": "5.12.0",
+    "request": "2.85.0"
+  }
+}
