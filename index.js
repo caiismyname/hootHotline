@@ -21,10 +21,33 @@ var firebase; // Global reference to Firebase DB. Set in initFirebase().
  * This functions as an enum of the available foods.
  */
 const FOODS = {
-    1: "Pizza",
-    2: "Sandwiches"
+    1: "Cheese Pizza",
+    2: "Pepperoni Pizza",
+    3: "Pineapple Pizza",
+    4: "Cheese Pizza",
+    5: "Sausage Pizza",
+    6: "Mushroom Pizza",
+    7: "HBCB",
+    8: "Tofu Banh Mi",
+    9: "Pork Banh Mi",
+    10: "Chicken Banh Mi",
+    11: "Beef Banh Mi",
+    12: "Tofu Spring Rolls",
+    13: "CFS Nuggets",
+    14: "CFA Regular Sandwich",
+    15: "CFA Spicy Sandwich",
+    16: "Cane's Fingers",
 }
 
+/**
+ * Enumerating the different sub-categories of the DB.
+ * Values evaluate to valid Firebase ref URLs.
+ */
+const CATEGORY = {
+    INVENTORY: "/inventory/",
+    HOURS: "/hours/",
+}
+ 
 function initFirebase() {
     // Verifying admin credentials for authenticated access to Firebase
     firebase = require("firebase-admin");
@@ -42,11 +65,9 @@ function initFirebase() {
 }
 
 /**
- * Starts a reference listening to the inventory DB.
+ * Hits firebase for inventory.
  * Renders the homepage (with inventory information) when first called.
- * Refreshes the homepage when updates to the DB occur.
  */
-
 function watchInventory(res) {
     const ref = firebase.database().ref("inventory");
     ref.on('value', function(snapshot) {
@@ -69,21 +90,45 @@ function watchInventory(res) {
     });
 }
 
+/**
+ * Update an entry in firebase.
+ * Example: InsertIntoFB(CATEGORY.HOURS, "isOpen", true);
+ */
+function insertIntoFB(category, key, value) {
+    const url = category + key;
+    var ref = firebase.database().ref(url);
+    ref.set(value);
+}
+
+/**
+ * Toggles boolean db entires. 
+ */
+function toggleFBValue(category, key) {
+    const url = category + key;
+    const ref = firebase.database().ref(url);
+    
+    ref.once('value', function(snapshot) {
+        const value  = snapshot.val();
+        // Safety check in case trying to toggle non-boolean.
+        if (typeof(value) === "boolean") {
+            insertIntoFB(category, key, !value);
+        } else {
+            console.log(`Tried to toggle non-boolean entry: ${url}`);
+        }
+    });
+}
+
 //
 //
 // Setting Express endpoints for the pages
 //
 //
 
-
+// Homepage
 app.get('/', function (req, res) {
     watchInventory(res);
 });
 
-function InsertIntoFBTest() {
-    var ref = firebase.database().ref("david");
-    ref.set("bar");
-}
 
 initFirebase();
 
