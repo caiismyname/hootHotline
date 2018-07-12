@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>Hoot Hotline Update Form</title>
+    <!-- Global site tag (gtag.js) - Google Analytics
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-115029309-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-115029309-1');
+    </script> -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+ 
+<body style="background-color:#BEB1E2"> 
+    <div class="pageheader" style="background-color:#341f70; padding:20px; color:white">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class='display-1'><b>Hoot Hotline Update Form</b></h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <br>
+        <br>
+        <br>
+        <!-- <form action="/submitupdate" method="post"> -->
+        <form id="updateForm">
+            <% for (let food in inventory) {%>
+                <div class="form-check">
+                    <% if (!inventory[food]) { %>
+                        <input class="form-check-input" type="checkbox" value="<%= food %>" id="<%= food %>" name="items" checked="checked">
+                    <% } else { %>
+                        <input class="form-check-input" type="checkbox" value="<%= food %>" id="<%= food %>" name="items">
+                    <% } %>
+                    <label class="form-check-label" for="<%= food %>"><%= food %></label>
+                </div>
+            <% } %>
+            <br>
+            <button type="submit" class="btn btn-primary" id="updateButton">Update</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready( function() {
+
+            $('#updateForm').on('submit', handleSubmit);
+
+            function handleSubmit(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/submitupdate',
+                    type: 'POST',
+                    data: $('#updateForm').serialize(),
+                });
+            }
+        });
+    </script>
+</body>
+ 
+</html>
