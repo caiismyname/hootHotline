@@ -4,7 +4,8 @@ from firebase_admin import db
 from dotenv import load_dotenv, find_dotenv
 from flask import Flask, request, render_template, redirect, url_for
 import os
-
+from datetime import datetime
+from dateutil import tz
 
 ################
 # Firebase
@@ -32,6 +33,17 @@ def initFirebase():
 	cred = credentials.Certificate(serviceAccountKey)
 	firebase_admin.initialize_app(cred, {"databaseURL": "https://hoothotline.firebaseio.com"})
 
+def refreshUpdateTime():
+	# Convert to central time
+	fromZone = tz.gettz('UTC')
+	toZone = tz.gettz('America/Chicago')
+	utc = datetime.utcnow().replace(tzinfo=fromZone)
+	central = utc.astimezone(toZone)
+	timeString = central.strftime("%I:%M %p")
+
+	ref = db.reference("last-update")
+	ref.set(timeString)
+
 ##################
 # Flask endpoints
 ##################
@@ -57,7 +69,8 @@ def receiveUpdate():
 				ref.set(False)
 			else :
 				ref.set(True)
-
+		
+		refreshUpdateTime()
 		return redirect(url_for('renderUpdateForm'))
 
 @app.route('/')
@@ -73,7 +86,12 @@ def hootHotline():
 		else:
 			outOfStock.append(food)
 
-	return render_template('hootHotline.html', inStock=inStock, outOfStock=outOfStock)
+	lastUpdate = db.reference('last-update').get()
+	# Strip leading zeros for aesthetics
+	if (lastUpdate[0] == "0"):
+		lastUpdate = lastUpdate[1:]
+
+	return render_template('hootHotline.html', inStock=inStock, outOfStock=outOfStock, lastUpdate=lastUpdate)
 
 
 ################
