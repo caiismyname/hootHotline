@@ -28,7 +28,6 @@ def isOpen():
 
 	return False
 
-
 ################
 # Firebase
 ################
@@ -64,6 +63,15 @@ def refreshUpdateTime():
 	ref = db.reference("last-update")
 	ref.set(timeString)
 
+# Returns the time system as last updated, as a string
+def getLastUpdateTime():
+	lastUpdate = db.reference('last-update').get()
+	# Strip leading zeros for aesthetics
+	if (lastUpdate[0] == "0"):
+		lastUpdate = lastUpdate[1:]
+	
+	return lastUpdate
+
 ##################
 # Flask endpoints
 ##################
@@ -75,7 +83,7 @@ def renderUpdateForm():
 	ref = db.reference("inventory")
 	foods = ref.get()
 
-	return render_template('updateForm.html', foods=foods)
+	return render_template('updateForm.html', foods=foods, lastUpdate=getLastUpdateTime())
 
 @app.route('/receiveUpdate', methods=['POST'])
 def receiveUpdate():
@@ -107,12 +115,7 @@ def hootHotline():
 			else:
 				outOfStock.append(food)
 
-		lastUpdate = db.reference('last-update').get()
-		# Strip leading zeros for aesthetics
-		if (lastUpdate[0] == "0"):
-			lastUpdate = lastUpdate[1:]
-
-		return render_template('hootHotline.html', inStock=inStock, outOfStock=outOfStock, lastUpdate=lastUpdate)
+		return render_template('hootHotline.html', inStock=inStock, outOfStock=outOfStock, lastUpdate=getLastUpdateTime())
 	else:
 		return render_template('hootClosed.html')
 
@@ -127,4 +130,4 @@ def initEnviron():
 
 
 initEnviron()
-# app.run()
+app.run()

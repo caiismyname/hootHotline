@@ -7,44 +7,43 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        @media (min-device-width: 375px) and (max-device-width: 736px) {
-            label {
-                font-size: 28px;
-                margin-left: 10px;
-            }
-
-            input[type=checkbox] {
-                transform: scale(2.33);
-            }
+        /* https://stackoverflow.com/questions/48293920/change-bootstrap-4-checkbox-size?rq=1 */
+        .custom-control-label::before, 
+        .custom-control-label::after {
+            top: .8rem;
+            width: 1.25rem;
+            height: 1.25rem;
         }
     </style>
 </head>
 
  
 <body> 
-    <div class="container">
-        <br>
-        <div class="row">
-            <div class="col-lg-12">
-                <h1>Hoot Update Form</h1>
+    <div class="pageheader" style="padding: 30px 0px;background-color:#BEB1E2">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1><b>Hoot Hotline Update Form</b></h1>
+                    <h2> Select the foods that are <b>OUT</b> of stock</h2>
+                    <h4> Last updated at {{ lastUpdate }}</h4>
+                </div>
             </div>
         </div>
- 
+    </div>
+    <br>
+    <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <h2> Select the foods that are OUT of stock</h2>
-                <br>
-                <hr>
-                <br>
                 <form action="/receiveUpdate" method="post">
                     {% for food, inStock in foods.items() %}
-                        <div class="form-check">
+                        <div class="custom-control custom-checkbox form-control-lg">
                             {% if inStock %}
-                            <input class="form-check-input" type="checkbox" value="{{ food }}" id="{{ food }}" name="foodItem">
+                            <input class="custom-control-input" type="checkbox" value="{{ food }}" id="{{ food }}" name="foodItem">
+                            <label class="custom-control-label" style="color:green" for="{{ food }}">{{ food }}</label>
                             {% else %}
-                            <input class="form-check-input" type="checkbox" value="{{ food }}" id="{{ food }}" name="foodItem" checked="checked">
+                            <input class="custom-control-input" type="checkbox" value="{{ food }}" id="{{ food }}" name="foodItem" checked="checked">
+                            <label class="custom-control-label" style="color:red" for="{{ food }}">{{ food }}</label>
                             {% endif %}
-                            <label class="form-check-label" for="{{ food }}">{{ food }}</label>
                         </div>
                     {% endfor %}
                     <br>
