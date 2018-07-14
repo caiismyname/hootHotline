@@ -8,6 +8,28 @@ from datetime import datetime
 from dateutil import tz
 
 ################
+# Utilities
+################
+def getHoustonTime():
+	fromZone = tz.gettz('UTC')
+	toZone = tz.gettz('America/Chicago')
+	utc = datetime.utcnow().replace(tzinfo=fromZone)
+	return utc.astimezone(toZone)
+
+def isOpen():
+	houstonNow = getHoustonTime()
+	# Hoot is open 8pm - 1:45am
+	if (houstonNow.hour >= 20):
+		return True
+	elif (houstonNow.hour == 0):
+		return True
+	elif (houstonNow.hour == 1 and houstonNow.minute < 45):
+		return True
+
+	return False
+
+
+################
 # Firebase
 ################
 
@@ -33,13 +55,11 @@ def initFirebase():
 	cred = credentials.Certificate(serviceAccountKey)
 	firebase_admin.initialize_app(cred, {"databaseURL": "https://hoothotline.firebaseio.com"})
 
+# Refreshes the "Last Updated" field saved in FB
+# that frontend pulls from. Is updated whenever
+# updateForm is submitted.
 def refreshUpdateTime():
-	# Convert to central time
-	fromZone = tz.gettz('UTC')
-	toZone = tz.gettz('America/Chicago')
-	utc = datetime.utcnow().replace(tzinfo=fromZone)
-	central = utc.astimezone(toZone)
-	timeString = central.strftime("%I:%M %p")
+	timeString = getHoustonTime().strftime("%I:%M %p")
 
 	ref = db.reference("last-update")
 	ref.set(timeString)
@@ -76,22 +96,25 @@ def receiveUpdate():
 @app.route('/')
 @app.route('/hootHotline')
 def hootHotline():
-	inventory = db.reference('inventory').get()
-	inStock = []
-	outOfStock = []
+	if (isOpen()):
+		inventory = db.reference('inventory').get()
+		inStock = []
+		outOfStock = []
 
-	for food in inventory:
-		if inventory[food]:
-			inStock.append(food)
-		else:
-			outOfStock.append(food)
+		for food in inventory:
+			if inventory[food]:
+				inStock.append(food)
+			else:
+				outOfStock.append(food)
 
-	lastUpdate = db.reference('last-update').get()
-	# Strip leading zeros for aesthetics
-	if (lastUpdate[0] == "0"):
-		lastUpdate = lastUpdate[1:]
+		lastUpdate = db.reference('last-update').get()
+		# Strip leading zeros for aesthetics
+		if (lastUpdate[0] == "0"):
+			lastUpdate = lastUpdate[1:]
 
-	return render_template('hootHotline.html', inStock=inStock, outOfStock=outOfStock, lastUpdate=lastUpdate)
+		return render_template('hootHotline.html', inStock=inStock, outOfStock=outOfStock, lastUpdate=lastUpdate)
+	else:
+		return render_template('hootClosed.html')
 
 
 ################
