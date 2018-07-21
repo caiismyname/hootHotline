@@ -80,16 +80,23 @@ app = Flask(__name__)
 
 @app.route('/updateForm')
 def renderUpdateForm():
-	ref = db.reference("inventory")
-	foods = ref.get()
+	foods = db.reference('inventory').get()
+	specialsMessage = db.reference('specials-message').get()
+	if (specialsMessage == "none"):
+		specialsMessage = ""
 
-	return render_template('updateForm.html', foods=foods, lastUpdate=getLastUpdateTime())
+	print("message {}".format(specialsMessage))
+
+	return render_template('updateForm.html', foods=foods, lastUpdate=getLastUpdateTime(), specialsMessage=specialsMessage)
 
 @app.route('/receiveUpdate', methods=['POST'])
 def receiveUpdate():
 	if request.method == "POST":
 		outOfStock = request.form.getlist("foodItem")
+		specialsMessage = request.form.get("specials-message")
+		
 		inventoryRef = db.reference("inventory")
+		smRef = db.reference("specials-message")
 
 		for food in inventoryRef.get().keys():
 			ref = db.reference("inventory/" + food)
@@ -97,6 +104,11 @@ def receiveUpdate():
 				ref.set(False)
 			else :
 				ref.set(True)
+
+		if (len(specialsMessage) > 0):
+			smRef.set(specialsMessage)
+		elif (len(specialsMessage) == 0):
+			smRef.set("none")
 		
 		refreshUpdateTime()
 		return redirect(url_for('renderUpdateForm'))
@@ -106,6 +118,7 @@ def receiveUpdate():
 def hootHotline():
 	if (isOpen()):
 		inventory = db.reference('inventory').get()
+		specialsMessage = db.reference('specials-message').get()
 		inStock = []
 		outOfStock = []
 
@@ -115,7 +128,7 @@ def hootHotline():
 			else:
 				outOfStock.append(food)
 
-		return render_template('hootHotline.html', inStock=inStock, outOfStock=outOfStock, lastUpdate=getLastUpdateTime())
+		return render_template('hootHotline.html', inStock=inStock, outOfStock=outOfStock, lastUpdate=getLastUpdateTime(), specialsMessage=specialsMessage)
 	else:
 		return render_template('hootClosed.html')
 
