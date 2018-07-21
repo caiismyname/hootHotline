@@ -35,13 +35,14 @@
     <div class="container">
         <br>
         <br>
+        <!-- The dashes near the % are important: http://jinja.pocoo.org/docs/2.10/templates/#whitespace-control -->
         {% if specialsMessage != "none" -%}
         <div class="row">
             <div class="col">
                 <h3>Specials: {{ specialsMessage }}</h3>
             </div>
         </div>
-    {%- endif %}
+        {%- endif %}
         <div class="row" style="font-size:28px">
             <div class="col-lg-6">
                 <h1 style="color:green">In Stock</h1>

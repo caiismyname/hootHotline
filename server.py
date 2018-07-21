@@ -6,6 +6,7 @@ from flask import Flask, request, render_template, redirect, url_for
 import os
 from datetime import datetime
 from dateutil import tz
+import sys
 
 ################
 # Utilities
@@ -143,4 +144,6 @@ def initEnviron():
 
 
 initEnviron()
-# app.run()
+if (len(sys.argv) > 1):
+	if ("-r" in sys.argv or "-run" in sys.argv):
+		app.run()
