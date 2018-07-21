@@ -19,15 +19,25 @@ def getHoustonTime():
 
 def isOpen():
 	houstonNow = getHoustonTime()
-	# Hoot is open 8pm - 1:45am
-	if (houstonNow.hour >= 20):
-		return True
-	elif (houstonNow.hour == 0):
-		return True
-	elif (houstonNow.hour == 1 and houstonNow.minute < 45):
-		return True
-
-	return False
+	# Hoot is open 8pm - 1:45am on Thursday, 8pm - 1am Sun-Wed
+	if (houstonNow.weekday() == 3): # Thurs
+		if (houstonNow.hour >= 20):
+			return True
+		elif (houstonNow.hour == 0):
+			return True
+		elif (houstonNow.hour == 1 and houstonNow.minute < 45):
+			return True
+		else:
+			return False
+	elif (houstonNow.weekday() in [0,1,2,6]): # MonTueWedSun
+		if (houstonNow.hour >= 20):
+			return True
+		elif (houstonNow.hour < 1):
+			return True
+		else:
+			return False
+	else: # Closed FriSat
+		return False
 
 ################
 # Firebase
