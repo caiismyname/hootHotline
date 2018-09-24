@@ -19,13 +19,13 @@ def getHoustonTime():
 
 def isOpen():
 	houstonNow = getHoustonTime()
-	# Hoot is open 8pm - 1:45am on Thursday, 8pm - 1am Sun-Wed
+	# Hoot is open 8pm - 1:30am on Thursday, 8pm - 1am Sun-Wed
 	if (houstonNow.weekday() == 3): # Thurs
 		if (houstonNow.hour >= 20):
 			return True
 		elif (houstonNow.hour == 0):
 			return True
-		elif (houstonNow.hour == 1 and houstonNow.minute < 45):
+		elif (houstonNow.hour == 1 and houstonNow.minute < 30):
 			return True
 		else:
 			return False
